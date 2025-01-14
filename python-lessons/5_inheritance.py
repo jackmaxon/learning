@@ -1,6 +1,6 @@
 ## Jack Maxon
 # Jan 12
-from random import getrandbits
+from random import getrandbits, choice
 
 
 # superclass, base class, parent class
@@ -55,12 +55,46 @@ class CoronaVirus(RNAVirus):
         # raise NotImplementedError()
     
 class SARSCov2(CoronaVirus):
+    known_variants = ["alpha", "beta", "gamma", "epsilon"]
     def __init__(self, variant):
         super().__init__("SARSCOV2", 2.49, 1.3)
         self.variant = variant
 
     def mutate(self):
         print(f"The {self.name} virus just mutated in its spike protein.")
+
+    @property
+    def variant(self):
+        return self._variant
+
+    @variant.setter
+    def variant(self, value):
+        if value.lower() not in self.known_variants:
+            raise ValueError("Expected a known variant of concern")
+        
+        self._variant = value.lower()
+
+class DoubleMutant(SARSCov2):
+    @SARSCov2.variant.setter
+    def variant(self, value):
+        self._variant = value.lower()
+
+class FunnyDict(dict):
+    not_found = ['404', 'Wait, where?', 'Try again, or dont?']
+    def __getitem__(self, key):
+        if key not in self:
+            return choice(self.not_found)
+        return super().__getitem__(key)
+
+class AvgList(list):
+    def __init__(self, *args):
+        if args and type(args[0]) != list:
+            super().__init__(args)
+        else:
+            super().__init__(args[0])
+    @property
+    def average(self):
+        return sum(self) / len(self)
 
 class VideoNotes:
     V = Virus("chandipura", 1.2, 1.1)
@@ -111,12 +145,35 @@ class VideoNotes:
         """
         pass
         # usually init it passed to super()
-        cv = SARSCov2("Omicron")
+        cv = SARSCov2("beta")
         # missing parent attributes
         print(cv.__dict__)
 
         # misuse: parent - child class relationship
         # child defines an init only for the purpose of calling parent init
 
-if __name__ == '__main__':
-    VideoNotes.idea3()
+        print(cv.__dict__)
+        dv = DoubleMutant("NEW")
+        print(dv.variant) 
+
+    @staticmethod
+    def idea4():
+        """
+        """
+        population = FunnyDict({
+            "CAN": 38,
+            "USA": 329,
+            "IND": 1380
+        })
+        population['CANADA'] # Key value error thrown by __getitem__
+
+        l = AvgList([1,10,2.23,21])
+        l2 = AvgList(1,2,3,4)
+
+        population.get("CAN")
+        # 
+        # self.get not implemented in our implementation of funny dict
+        # we can get around this using the collections module
+
+if __name__ == '__main__': 
+    VideoNotes.idea4()
