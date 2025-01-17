@@ -2,7 +2,7 @@
 # Jan 16 2024
 from collections import namedtuple
 from typing import NamedTuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import total_ordering
 from typing import Any
 
@@ -18,11 +18,17 @@ class EVehicle(NamedTuple):
     make: str
     price: int = 39000
 
-@dataclass
+@dataclass(order = True, frozen=True)
 class ElectricVehicle:
-    range: int
-    make: str
-    price: int
+    range: int =field(compare=True)
+    make: str = field(default="Tesla", compare=False)
+    price: int = field(default="56000", repr=False, compare=False)
+    luxury: bool = False
+
+    def __post__init__(self):
+        luxury_brands = ["BMW", "Mercedez"]
+
+        self.luxury = self.make in luxury_brands and self.price > 80000
 
 # fuck da note class
 def notes1():
@@ -61,6 +67,9 @@ def notes2():
     # give us nice default repr, eq, 
     # @dataclass(order=True) gives > method, etc
 
+    # dataclass fields are mutable
+    # hashable if frozen
+    # inheritance works as expected
 
 
 if __name__ == '__main__':
